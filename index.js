@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
+require('dotenv').config()
 
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -13,8 +14,8 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema)
 
-const mongoUrl = 'mongodb://localhost/bloglist'
-mongoose.connect(mongoUrl)
+const mongoUrl = process.env.MONGO_URI
+mongoose.connect(mongoUrl).then(res => console.log('connected to db'))
 
 app.use(cors())
 app.use(express.json())
