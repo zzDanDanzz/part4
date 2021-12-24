@@ -6,9 +6,11 @@ const mongoose = require('mongoose')
 
 const blogsRouter = require('./controllers/blogs')
 const config = require('./utils/config')
+const logger = require('./utils/logger')
+
 
 const MONGO_URI = config.MONGO_URI
-mongoose.connect(MONGO_URI).then(res => console.log('connected to db'))
+mongoose.connect(MONGO_URI).then(res => logger.info('connected to db'))
 
 app.use(cors())
 app.use(express.json())
