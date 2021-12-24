@@ -1,4 +1,3 @@
-const http = require('http')
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -10,7 +9,7 @@ const logger = require('./utils/logger')
 
 
 const MONGO_URI = config.MONGO_URI
-mongoose.connect(MONGO_URI).then(res => logger.info('connected to db'))
+mongoose.connect(MONGO_URI).then(() => logger.info('connected to db'))
 
 app.use(cors())
 app.use(express.json())
