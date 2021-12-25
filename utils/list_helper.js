@@ -27,4 +27,20 @@ const mostBlogs = (blogs) => {
 
 }
 
-module.exports = { totalLikes, favoriteBlog, mostBlogs }
+const mostLikes = (blogs) => {
+  const authors = [...new Set(blogs.map(b => b.author))]
+  const likes = authors.slice().fill(0, 0, authors.length)
+  blogs.forEach(b =>{
+    for (let i = 0; i < authors.length; i++) {
+      if (authors[i] === b.author) {
+        likes[i]+=b.likes
+        break
+      }
+    }
+  })
+
+  const maxLikes = Math.max(...likes)
+  return { author: authors[likes.indexOf(maxLikes)], likes: maxLikes }
+}
+
+module.exports = { totalLikes, favoriteBlog, mostBlogs, mostLikes }
