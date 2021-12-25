@@ -83,3 +83,16 @@ describe('FAVORITE BLOG : ', () => {
   })
 
 })
+
+
+describe('MOST BLOGS : ', () => {
+  test('of multiple blogs returns author with most posts', () => {
+    const result = listHelper.mostBlogs(multipleBlogs)
+    expect(result).toEqual({author: "Edsger W. Dijkstra", posts: 2})
+  })
+  test('of one blog returns author of that blog', () => {
+    const result = listHelper.mostBlogs(oneBlog)
+    const { author } = oneBlog[0]
+    expect(result).toEqual({ author, posts: 1})
+  })
+})
