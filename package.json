@@ -18,9 +18,8 @@
   },
   "devDependencies": {
     "dotenv": "^10.0.0",
-    "eslint": "^8.5.0",
-    "eslint-config-google": "^0.14.0",
     "jest": "^27.4.5",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "standard": "^16.0.4"
   }
 }
