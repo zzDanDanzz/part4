@@ -46,14 +46,40 @@ describe('TOTAL LIKES : ', () => {
     const result = listHelper.totalLikes(multipleBlogs)
     expect(result).toBe(24)
   })
-  test('of zero blogs is zero', () => {
-    const result = listHelper.totalLikes(zeroBlogs)
-    expect(result).toBe(0)
-  })
   test('of one blog is just the likes of that blog', () => {
     const result = listHelper.totalLikes(oneBlog)
     expect(result).toBe(oneBlog[0].likes)
   })
+  test('of zero blogs is zero', () => {
+    const result = listHelper.totalLikes(zeroBlogs)
+    expect(result).toBe(0)
+  })
+  
 
+})
+
+describe('FAVORITE BLOG : ', () => {
+  test('of multiple blogs returns blog with most likes', () => {
+    const expectedValue = {
+      _id: "5a422b3a1b54a676234d17f9",
+      title: "Canonical string reduction",
+      author: "Edsger W. Dijkstra",
+      url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+      likes: 12,
+      __v: 0
+    }
+    const result = listHelper.favoriteBlog(multipleBlogs)
+    expect(result).toEqual(expectedValue)
+  })
+
+  test('of one blog returns the blog itself', () => {
+    const result = listHelper.favoriteBlog(oneBlog)
+    expect(result).toEqual(oneBlog[0])
+  })
+
+  test('of zero blogs returns 0', () => {
+    const result = listHelper.favoriteBlog([])
+    expect(result).toEqual(0)
+  })
 
 })
