@@ -8,16 +8,12 @@ const { multipleBlogs, zeroBlogs, oneBlog } = require('./test_helpers')
 beforeEach(async () => {
   logger.info('running beforeEach')
   logger.info('clearing db')
-  try {
-    await Blog.deleteMany()
-    logger.green('db cleared successfully!')
-    for (const ind in multipleBlogs) {
-      const blog = new Blog(multipleBlogs[ind])
-      await blog.save()
-      logger.green('saved entry')
-    }
-  } catch (err) {
-    logger.red('there was an error ::: ', err.message)
+  await Blog.deleteMany()
+  logger.green('db cleared successfully!')
+  for (const ind in multipleBlogs) {
+    const blog = new Blog(multipleBlogs[ind])
+    await blog.save()
+    logger.green('saved entry')
   }
 }, 100000)
 
@@ -51,16 +47,12 @@ describe('HTTP POST', () => {
   }, 100000)
 
   test('posted objects have id property', async () => {
-    try {
-      const response = await request(app).get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /json/)
-      response.body.forEach(p => {
-        expect(p.id).toBeDefined()
-      })
-    } catch (error) {
-      logger.red('sry, error ::: ', error.message)
-    }
+    const response = await request(app).get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /json/)
+    response.body.forEach(p => {
+      expect(p.id).toBeDefined()
+    })
   })
 })
 
