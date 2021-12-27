@@ -6,14 +6,10 @@ const request = require('supertest')
 const { multipleBlogs, zeroBlogs, oneBlog } = require('./test_helpers')
 
 beforeEach(async () => {
-  logger.info('running beforeEach')
-  logger.info('clearing db')
   await Blog.deleteMany()
-  logger.green('db cleared successfully!')
   for (const ind in multipleBlogs) {
     const blog = new Blog(multipleBlogs[ind])
     await blog.save()
-    logger.green('saved entry')
   }
 }, 100000)
 
@@ -53,6 +49,18 @@ describe('HTTP POST', () => {
     response.body.forEach(p => {
       expect(p.id).toBeDefined()
     })
+  })
+
+  test('if no like property it defaults to 0', async () => {
+    const oneBlogNoLikes = { ...oneBlog }
+    delete oneBlogNoLikes.likes
+
+    const resp = await request(app).post('/api/blogs')
+      .expect('Content-Type', /json/)
+      .send(oneBlogNoLikes)
+      .expect(201)
+
+    expect(resp.body.likes).toBe(0)
   })
 })
 
