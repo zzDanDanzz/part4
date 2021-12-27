@@ -22,11 +22,24 @@ beforeEach(async () => {
 }, 100000)
 
 test('GET /api/blogs', async () => {
-  const retNotes = await request(app).get('/api/blogs')
+  const response = await request(app).get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /json/)
-  expect(retNotes.body).toHaveLength(multipleBlogs.length)
+  expect(response.body).toHaveLength(multipleBlogs.length)
 }, 100000)
+
+test.only('post objects have id property', async () => {
+  try {
+    const response = await request(app).get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /json/)
+    response.body.forEach(p => {
+      expect(p['id']).toBeDefined()
+    })
+  } catch (error) {
+    logger.red('sry, error ::: ', error.message)
+  }
+})
 
 
 afterAll(async () => {
