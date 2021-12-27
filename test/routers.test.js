@@ -62,6 +62,18 @@ describe('HTTP POST', () => {
 
     expect(resp.body.likes).toBe(0)
   })
+
+  test('if url and title missing then error', async () => {
+    const oneBlogIncomplete = { ...oneBlog }
+    delete oneBlogIncomplete.url
+    delete oneBlogIncomplete.title
+
+    const resp = await request(app).post('/api/blogs')
+      .expect('Content-Type', /json/)
+      .send(oneBlogIncomplete)
+      .expect(400)
+
+  })
 })
 
 afterAll(async () => {
