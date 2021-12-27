@@ -1,5 +1,7 @@
 const listHelper = require('../utils/list_helper')
-const { multipleBlogs, zeroBlogs, oneBlog } = require('./test_helpers')
+const { multipleBlogs, zeroBlogs } = require('./test_helpers')
+
+const oneBlog = multipleBlogs.slice(0,1)
 
 describe('TOTAL LIKES : ', () => {
   test('of multiple blogs is the sum of their like', () => {
@@ -19,12 +21,10 @@ describe('TOTAL LIKES : ', () => {
 describe('FAVORITE BLOG : ', () => {
   test('of multiple blogs returns blog with most likes', () => {
     const expectedValue = {
-      _id: '5a422b3a1b54a676234d17f9',
       title: 'Canonical string reduction',
       author: 'Edsger W. Dijkstra',
       url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
       likes: 12,
-      __v: 0
     }
     const result = listHelper.favoriteBlog(multipleBlogs)
     expect(result).toEqual(expectedValue)

@@ -3,7 +3,7 @@ const app = require('../app')
 const mongoose = require('mongoose')
 const logger = require('../utils/logger')
 const request = require('supertest')
-const { multipleBlogs } = require('./test_helpers')
+const { multipleBlogs, zeroBlogs, oneBlog } = require('./test_helpers')
 
 beforeEach(async () => {
   logger.info('running beforeEach')
@@ -21,26 +21,48 @@ beforeEach(async () => {
   }
 }, 100000)
 
-test('GET /api/blogs', async () => {
-  const response = await request(app).get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /json/)
-  expect(response.body).toHaveLength(multipleBlogs.length)
-}, 100000)
-
-test.only('post objects have id property', async () => {
-  try {
+describe('HTTP GET', () => {
+  test('/api/blogs', async () => {
     const response = await request(app).get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /json/)
-    response.body.forEach(p => {
-      expect(p['id']).toBeDefined()
-    })
-  } catch (error) {
-    logger.red('sry, error ::: ', error.message)
-  }
+    expect(response.body).toHaveLength(multipleBlogs.length)
+  }, 100000)
 })
 
+describe('HTTP POST', () => {
+  test('/api/blogs', async () => {
+    await request(app).post('/api/blogs')
+      .expect('Content-Type', /json/)
+      .send(oneBlog)
+      .expect(201)
+
+    const response = await request(app).get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /json/)
+
+    expect(response.body).toHaveLength(multipleBlogs.length + 1)
+
+    const postsWithNoID = response.body.map(p => {
+      delete p.id
+      return p
+    })
+    expect(postsWithNoID).toContainEqual(oneBlog)
+  }, 100000)
+
+  test('posted objects have id property', async () => {
+    try {
+      const response = await request(app).get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /json/)
+      response.body.forEach(p => {
+        expect(p.id).toBeDefined()
+      })
+    } catch (error) {
+      logger.red('sry, error ::: ', error.message)
+    }
+  })
+})
 
 afterAll(async () => {
   logger.info('closing connection to db')
