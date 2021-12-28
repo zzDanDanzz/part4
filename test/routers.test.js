@@ -76,6 +76,23 @@ describe('HTTP POST', () => {
   })
 })
 
+describe('HTTP DELETE', () => {
+  test('successfully deletes at /api/blogs/:id', async () => {
+    const posts = await Blog.find()
+    const id = posts[0].id
+    await request(app)
+      .delete('/api/blogs/' + id)
+      .expect(204)
+  })
+
+  test('returns 404 if id doesnt exist', async () => {
+    const id = '1'.repeat(24)
+    await request(app)
+      .delete('/api/blogs/' + id)
+      .expect(404)
+  })
+})
+
 afterAll(async () => {
   logger.info('closing connection to db')
   await mongoose.connection.close()
