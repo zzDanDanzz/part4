@@ -69,6 +69,49 @@ describe('creating new user', () => {
       expect(response.body.error).toMatch(/string type/)
     }, 100000)
   })
+
+  describe('username is', () => {
+    test('missing, fails', async () => {
+      const oneUserNoUser = { ...oneUser }
+      delete oneUserNoUser.username
+
+      const response = await request(app).post('/api/users')
+        .expect('Content-Type', /json/)
+        .send(oneUserNoUser)
+        .expect(400)
+
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error).toMatch(/username.+required/)
+    })
+
+    test('too short, fails', async () => {
+      const shortUsername = { ...oneUser }
+      shortUsername.username = 'da'
+
+      const response = await request(app).post('/api/users')
+        .expect('Content-Type', /json/)
+        .send(shortUsername)
+        .expect(400)
+
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error).toMatch(/username.+shorter.+minimum/)
+    })
+
+    test('not unique, fails', async () => {
+      await request(app).post('/api/users')
+        .expect('Content-Type', /json/)
+        .send(oneUser)
+        .expect(201)
+
+      const response = await request(app).post('/api/users')
+        .expect('Content-Type', /json/)
+        .send(oneUser)
+        .expect(400)
+
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error).toMatch(/username.+unique/)
+    })
+  })
 })
 
 afterAll(async () => {
