@@ -17,4 +17,4 @@ function passwordVerification (password) {
   }
 }
 
-module.exports = passwordVerification
+module.exports = {passwordVerification, ValidationError}
