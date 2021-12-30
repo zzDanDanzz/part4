@@ -2,3 +2,4 @@ node_modules/
 requests/
 .env
 jibber.js
+mongocli.js
