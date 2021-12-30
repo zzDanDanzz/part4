@@ -8,8 +8,6 @@ const logger = require('../utils/logger')
 
 loginRouter.post('/', async (req, res) => {
   const { username, password } = req.body
-  logger.info('username (from req.body) :: ', username)
-  logger.info('password (from req.body) :: ', password)
   const user = await User.findOne({ username })
   if (user) {
     if (!await bcrypt.compare(password, user.pwdHash)) {

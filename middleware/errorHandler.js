@@ -8,6 +8,9 @@ function errorHandler (error, request, response, next) {
   if (error.name === 'ValidationError') {
     return response.status(400).send({ error: error.message })
   }
+  if (error.name === 'AuthError') {
+    return response.status(401).send({ error: error.message })
+  }
   logger.red(error.message)
 
   // the others go to express's error handler(s)

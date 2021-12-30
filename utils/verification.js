@@ -6,6 +6,13 @@ class ValidationError extends Error {
   }
 }
 
+class AuthError extends Error {
+  constructor (message) {
+    super(message)
+    this.name = 'AuthError'
+  }
+}
+
 // password verification
 function passwordVerification (password) {
   if (!password) {
@@ -17,4 +24,4 @@ function passwordVerification (password) {
   }
 }
 
-module.exports = {passwordVerification, ValidationError}
+module.exports = { passwordVerification, ValidationError, AuthError }

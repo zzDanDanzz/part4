@@ -1,6 +1,9 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const logger = require('../utils/logger')
+const jwt = require('jsonwebtoken')
+const config = require('../utils/config')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
@@ -15,11 +18,11 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const users = await User.find()
-  const firstUser = users[0]
-  const blog = new Blog({ ...request.body, user: firstUser.id })
-  firstUser.blogs = firstUser.blogs.concat(blog._id)
-  await firstUser.save()
+  const decodedToken = jwt.verify(request.token, config.SECRET)
+  const blog = new Blog({ ...request.body, user: decodedToken.id })
+  const user = await User.findById(decodedToken.id)
+  user.blogs = user.blogs.concat(blog._id)
+  await user.save()
   const savedBlog = await blog.save()
   response.status(201).json(savedBlog)
 })
