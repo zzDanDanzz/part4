@@ -19,8 +19,13 @@ blogsRouter.get('/:id', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const decodedToken = jwt.verify(request.token, config.SECRET)
+
   const blog = new Blog({ ...request.body, user: decodedToken.id })
   const user = await User.findById(decodedToken.id)
+  if (!user) {
+    response.status(400).json({ error: 'user no longer exists' })
+    return
+  }
   user.blogs = user.blogs.concat(blog._id)
   await user.save()
   const savedBlog = await blog.save()
@@ -29,8 +34,9 @@ blogsRouter.post('/', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   const id = request.params.id
-  if (!await Blog.findByIdAndDelete(id)) {
-    response.status(404).end()
+  const blogToDelete = await Blog.findByIdAndDelete(id)
+  if (!blogToDelete) {
+    response.status(404).json({ error: 'blog no longer exists' })
   } else {
     response.status(204).end()
   }
