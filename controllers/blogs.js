@@ -4,6 +4,7 @@ const User = require('../models/user')
 const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
+const tokenExtractor = require('../middleware/tokenExtractor')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
@@ -17,7 +18,7 @@ blogsRouter.get('/:id', async (request, response) => {
   response.json(retBlog)
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', tokenExtractor, async (request, response) => {
   const decodedToken = jwt.verify(request.token, config.SECRET)
 
   const blog = new Blog({ ...request.body, user: decodedToken.id })
@@ -32,7 +33,7 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', tokenExtractor, async (request, response) => {
   const id = request.params.id
   const blogToDelete = await Blog.findByIdAndDelete(id)
   if (!blogToDelete) {

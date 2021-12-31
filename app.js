@@ -8,7 +8,6 @@ const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const config = require('./utils/config')
 const errorHandler = require('./middleware/errorHandler')
-const getTokenFrom = require('./middleware/tokenExtractor')
 
 const app = express()
 
@@ -22,7 +21,6 @@ app.use('/api/users', usersRouter)
 
 app.use('/login', loginRouter)
 
-app.use(getTokenFrom)
 app.use('/api/blogs', blogsRouter)
 
 app.use(errorHandler)

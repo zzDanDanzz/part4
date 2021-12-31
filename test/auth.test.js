@@ -51,7 +51,7 @@ describe('delete a blog', () => {
       .expect(201)
     const newBlogId = response.body.id
     await request(app)
-      .delete('/api/blogs')
+      .delete('/api/blogs/' + newBlogId)
       .send(newBlogId)
       .expect(401)
   })
