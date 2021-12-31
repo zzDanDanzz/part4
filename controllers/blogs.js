@@ -18,7 +18,7 @@ blogsRouter.get('/:id', async (request, response) => {
   response.json(retBlog)
 })
 
-blogsRouter.post('/', token.getToken, async (request, response) => {
+blogsRouter.post('/', token.getToken, token.getUser, async (request, response) => {
   const decodedToken = jwt.verify(request.token, config.SECRET)
 
   const blog = new Blog({ ...request.body, user: decodedToken.id })
@@ -33,7 +33,7 @@ blogsRouter.post('/', token.getToken, async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete('/:id', token.getToken, async (request, response) => {
+blogsRouter.delete('/:id', token.getToken, token.getUser, async (request, response) => {
   const id = request.params.id
   const blogToDelete = await Blog.findByIdAndDelete(id)
   if (!blogToDelete) {
