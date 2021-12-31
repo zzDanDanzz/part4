@@ -77,7 +77,14 @@ describe('delete a blog', () => {
   })
 })
 
-describe.only('POST operations', () => {
+describe('GET operations', () => {
+  test.only('can GET all in /api/blogs', async () => {
+    const response = await getAll('blogs', 200)
+    expect(response.body).toHaveLength(multipleBlogs.length)
+  })
+})
+
+describe('POST operations', () => {
   test('can GET blog after POST', async () => {
     await postOneBlog(oneBlog, ONEUSER_TOKEN, 201)
 
@@ -116,6 +123,16 @@ describe.only('POST operations', () => {
     delete oneBlogIncomplete.title
 
     await postOneBlog(oneBlogIncomplete, ONEUSER_TOKEN, 400)
+  })
+})
+
+describe('DELETE operations', () => {
+  test('returns 404 if id doesnt exist', async () => {
+    const id = '1'.repeat(24)
+    await request(app)
+      .delete('/api/blogs/' + id)
+      .set('Authorization', 'bearer ' + ONEUSER_TOKEN)
+      .expect(404)
   })
 })
 
