@@ -1,7 +1,7 @@
 const { AuthError } = require('../utils/verification')
 const logger = require('../utils/logger')
 
-const getTokenFrom = (req, res, next) => {
+const getToken = (req, res, next) => {
   const authHeader = req.get('authorization')
   if (authHeader && authHeader.includes('bearer ')) {
     req.token = authHeader.substring(7)
@@ -11,4 +11,4 @@ const getTokenFrom = (req, res, next) => {
   }
 }
 
-module.exports = getTokenFrom
+module.exports = {getToken}
