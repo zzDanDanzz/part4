@@ -1,3 +1,5 @@
+const Blog = require('../models/blog')
+
 // new errors
 class ValidationError extends Error {
   constructor (message) {
@@ -24,4 +26,11 @@ function passwordVerification (password) {
   }
 }
 
-module.exports = { passwordVerification, ValidationError, AuthError }
+async function userVerification (blogID, user) {
+  const blog = await Blog.findById(blogID)
+  if (JSON.stringify(blog.user) !== JSON.stringify(user._id)) {
+    throw new AuthError('not authorized')
+  }
+}
+
+module.exports = { passwordVerification, userVerification, ValidationError, AuthError }

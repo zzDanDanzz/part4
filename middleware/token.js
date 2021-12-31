@@ -2,21 +2,23 @@ const { AuthError } = require('../utils/verification')
 const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
+const User = require('../models/user')
 
-const getToken = (req, res, next) => {
+const getUser = async (req, res, next) => {
   const authHeader = req.get('authorization')
+  let token = ''
   if (authHeader && authHeader.includes('bearer ')) {
-    req.token = authHeader.substring(7)
-    next()
+    token = authHeader.substring(7)
   } else {
     throw new AuthError('token missing or invalid')
   }
-}
-
-const getUser = (req, res, next) => {
-  const decodedToken = jwt.verify(req.token, config.SECRET)
-  req.user = decodedToken.username
+  const decodedToken = jwt.verify(token, config.SECRET)
+  const user = await User.findOne({ username: decodedToken.username })
+  if (!user) {
+    throw new AuthError('user no longer exists')
+  }
+  req.user = user
   next()
 }
 
-module.exports = { getToken, getUser }
+module.exports = { getUser }

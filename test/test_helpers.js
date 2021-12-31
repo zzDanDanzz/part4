@@ -1,3 +1,7 @@
+const app = require('../app')
+const logger = require('../utils/logger')
+const request = require('supertest')
+
 const multipleBlogs = [
   {
     title: 'React patterns',
@@ -22,12 +26,12 @@ const multipleBlogs = [
 const zeroBlogs = []
 
 const oneBlog =
-  {
-    title: 'TDD harms architecture',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: 0
-  }
+{
+  title: 'TDD harms architecture',
+  author: 'Robert C. Martin',
+  url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
+  likes: 0
+}
 
 const oneUser = {
   username: 'daniboi',
@@ -35,4 +39,26 @@ const oneUser = {
   password: '123123'
 }
 
-module.exports = { multipleBlogs, zeroBlogs, oneBlog, oneUser }
+const getAll = async (thing, code) => {
+  return await request(app).get(`/api/${thing}`)
+    .expect(code)
+    .expect('Content-Type', /json/)
+}
+
+const postMultipleBlogs = async (blogs, token, code) => {
+  for (const b of blogs) {
+    await postOneBlog(b, token, code)
+  }
+}
+
+const postOneBlog = async (blog, token, code) => {
+  const res = await request(app)
+    .post('/api/blogs')
+    .set('Content-Type', 'application/json')
+    .set('Authorization', 'bearer ' + token)
+    .send(blog)
+    .expect(code)
+  return res
+}
+
+module.exports = { multipleBlogs, zeroBlogs, oneBlog, oneUser, getAll, postMultipleBlogs, postOneBlog }

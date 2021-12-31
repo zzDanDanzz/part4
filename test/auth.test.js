@@ -4,29 +4,7 @@ const app = require('../app')
 const mongoose = require('mongoose')
 const logger = require('../utils/logger')
 const request = require('supertest')
-const { multipleBlogs, oneBlog, oneUser } = require('./test_helpers')
-
-const getAll = async (thing, code) => {
-  return await request(app).get(`/api/${thing}`)
-    .expect(code)
-    .expect('Content-Type', /json/)
-}
-
-const postMultipleBlogs = async (blogs, token, code) => {
-  for (const b of blogs) {
-    await postOneBlog(b, token, code)
-  }
-}
-
-const postOneBlog = async (blog, token, code) => {
-  const res = await request(app)
-    .post('/api/blogs')
-    .set('Content-Type', 'application/json')
-    .set('Authorization', 'bearer ' + token)
-    .send(blog)
-    .expect(code)
-  return res
-}
+const { multipleBlogs, oneBlog, oneUser, getAll, postOneBlog, postMultipleBlogs } = require('./test_helpers')
 
 let ONEUSER_TOKEN = ''
 
@@ -78,7 +56,7 @@ describe('delete a blog', () => {
 })
 
 describe('GET operations', () => {
-  test.only('can GET all in /api/blogs', async () => {
+  test('can GET all in /api/blogs', async () => {
     const response = await getAll('blogs', 200)
     expect(response.body).toHaveLength(multipleBlogs.length)
   })

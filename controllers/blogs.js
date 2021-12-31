@@ -5,6 +5,7 @@ const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 const token = require('../middleware/token')
+const { AuthError, userVerification } = require('../utils/verification')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
@@ -18,23 +19,22 @@ blogsRouter.get('/:id', async (request, response) => {
   response.json(retBlog)
 })
 
-blogsRouter.post('/', token.getToken, token.getUser, async (request, response) => {
-  const decodedToken = jwt.verify(request.token, config.SECRET)
-
-  const blog = new Blog({ ...request.body, user: decodedToken.id })
-  const user = await User.findById(decodedToken.id)
+blogsRouter.post('/', token.getUser, async (request, response) => {
+  const user = request.user
   if (!user) {
     response.status(400).json({ error: 'user no longer exists' })
     return
   }
-  user.blogs = user.blogs.concat(blog._id)
-  await user.save()
+  const blog = new Blog({ ...request.body, user: user._id })
+  const newBlogs = user.blogs.concat(blog._id)
+  await User.findByIdAndUpdate(user._id, { blogs: newBlogs })
   const savedBlog = await blog.save()
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete('/:id', token.getToken, token.getUser, async (request, response) => {
+blogsRouter.delete('/:id', token.getUser, async (request, response) => {
   const id = request.params.id
+  await userVerification(id, request.user)
   const blogToDelete = await Blog.findByIdAndDelete(id)
   if (!blogToDelete) {
     response.status(404).json({ error: 'blog no longer exists' })
@@ -43,8 +43,9 @@ blogsRouter.delete('/:id', token.getToken, token.getUser, async (request, respon
   }
 })
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', token.getUser, async (request, response) => {
   const id = request.params.id
+  await userVerification(id, request.user)
   const { likes } = request.body
   const updatedPost = await Blog.findByIdAndUpdate(id, { likes }, { new: true, runValidators: true, context: 'query' })
   if (!updatedPost) {
