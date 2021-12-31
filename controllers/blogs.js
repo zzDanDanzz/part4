@@ -34,11 +34,12 @@ blogsRouter.post('/', token.getUser, async (request, response) => {
 
 blogsRouter.delete('/:id', token.getUser, async (request, response) => {
   const id = request.params.id
-  await userVerification(id, request.user)
-  const blogToDelete = await Blog.findByIdAndDelete(id)
+  const blogToDelete = await Blog.findById(id)
   if (!blogToDelete) {
     response.status(404).json({ error: 'blog no longer exists' })
   } else {
+    await userVerification(id, request.user)
+    blogToDelete.delete()
     response.status(204).end()
   }
 })

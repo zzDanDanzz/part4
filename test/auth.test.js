@@ -114,6 +114,21 @@ describe('DELETE operations', () => {
   })
 })
 
+describe('PUT operations', () => {
+  test('likes updated successfully', async () => {
+    const posts = await Blog.find()
+    const id = posts[0].id
+    const likes = posts[0].likes
+    const response = await request(app)
+      .put('/api/blogs/' + id)
+      .set('Authorization', 'bearer ' + ONEUSER_TOKEN)
+      .expect('Content-Type', /json/)
+      .send({ likes: likes + 1 })
+      .expect(200)
+    expect(response.body.likes).toBe(likes + 1)
+  })
+})
+
 afterAll(async () => {
   logger.green('disconnected from db')
   await mongoose.connection.close()
