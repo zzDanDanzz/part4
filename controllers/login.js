@@ -17,7 +17,7 @@ loginRouter.post('/', async (req, res) => {
     throw new ValidationError('invalid username')
   }
 
-  const dataToTurnIntoToken = { username: user.username, id: user._id }
+  const dataToTurnIntoToken = { username: user.username, name: user.name, id: user._id }
 
   const token = jwt.sign(dataToTurnIntoToken, SECRET, { expiresIn: 60 * 60 })
 
