@@ -11,6 +11,13 @@ function errorHandler (error, request, response, next) {
   if (error.name === 'AuthError') {
     return response.status(401).send({ error: error.message })
   }
+  if (error.name === 'TokenExpiredError') {
+    return response.status(401).send({ error: 'sorry, your session has expired. Log in again.' })
+  }
+  if (error.name === 'JsonWebTokenError') {
+    return response.status(401).send({ error: 'token format is not valid' })
+  }
+  
   logger.red(error.message)
 
   // the others go to express's error handler(s)
