@@ -26,11 +26,14 @@ function passwordVerification (password) {
   }
 }
 
-async function userVerification (blogID, user) {
+async function userAndBlogVerification (blogID, user) {
   const blog = await Blog.findById(blogID)
+  if (!blog) {
+    throw new ValidationError('blog no longer exists')
+  }
   if (JSON.stringify(blog.user) !== JSON.stringify(user._id)) {
     throw new AuthError('not authorized')
   }
 }
 
-module.exports = { passwordVerification, userVerification, ValidationError, AuthError }
+module.exports = { passwordVerification, userAndBlogVerification, ValidationError, AuthError }

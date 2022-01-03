@@ -5,7 +5,7 @@ const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 const token = require('../middleware/token')
-const { AuthError, userVerification } = require('../utils/verification')
+const { AuthError, userAndBlogVerification } = require('../utils/verification')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
@@ -35,25 +35,24 @@ blogsRouter.post('/', token.getUser, async (request, response) => {
 blogsRouter.delete('/:id', token.getUser, async (request, response) => {
   const id = request.params.id
   const user = request.user
-  const blogToDelete = await Blog.findById(id)
-  if (!blogToDelete) {
-    response.status(404).json({ error: 'blog no longer exists' })
-  } else {
-    await userVerification(id, user)
-    blogToDelete.delete()
-    const blogIndex = user.blogs.indexOf(blogToDelete._id)
-    const updatedBlogsArr = user.blogs
-      .slice(0, blogIndex)
-      .concat(user.blogs.slice(blogIndex + 1))
-    await User.findByIdAndUpdate(user._id, { blogs: updatedBlogsArr })
-    response.status(204).end()
-  }
+  await userAndBlogVerification(id, user)
+  await Blog.findByIdAndDelete(id)
+  const blogIndex = user.blogs.indexOf(id)
+  const updatedBlogsArr = user.blogs
+    .slice(0, blogIndex)
+    .concat(user.blogs.slice(blogIndex + 1))
+  await User.findByIdAndUpdate(user._id, { blogs: updatedBlogsArr })
+  response.status(204).end()
 })
 
 blogsRouter.put('/:id', token.getUser, async (request, response) => {
   const id = request.params.id
-  await userVerification(id, request.user)
+  await userAndBlogVerification(id, request.user)
   const { likes } = request.body
+  if (!likes) {
+    response.status(404).json({ error: 'likes was not found in request body' });
+    return
+  }
   const updatedPost = await Blog.findByIdAndUpdate(id, { likes }, { new: true, runValidators: true, context: 'query' })
   if (!updatedPost) {
     response.status(400).json({ error: 'post does not exist' })
