@@ -5,7 +5,7 @@ const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 const token = require('../middleware/token')
-const { AuthError, userAndBlogVerification } = require('../utils/verification')
+const { AuthError, userAndBlogVerification, ValidationError } = require('../utils/verification')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
@@ -47,18 +47,16 @@ blogsRouter.delete('/:id', token.getUser, async (request, response) => {
 
 blogsRouter.put('/:id', token.getUser, async (request, response) => {
   const id = request.params.id
-  await userAndBlogVerification(id, request.user)
   const { likes } = request.body
   if (!likes) {
     response.status(404).json({ error: 'likes was not found in request body' });
     return
   }
-  const updatedPost = await Blog.findByIdAndUpdate(id, { likes }, { new: true, runValidators: true, context: 'query' })
-  if (!updatedPost) {
-    response.status(400).json({ error: 'post does not exist' })
-    return
+  const updatedBlog = await Blog.findOneAndReplace({ id }, request.body, { new: true, runValidators: true, context: 'query' })
+  if (!updatedBlog) {
+    throw new ValidationError('blog no longer exists')
   }
-  response.json(updatedPost)
+  response.json(updatedBlog)
 })
 
 module.exports = blogsRouter
